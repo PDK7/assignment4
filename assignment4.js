@@ -30,6 +30,10 @@ function getPotentialMatches(search_text, search_list) {
   return to_return;
 }
 
+function buildGoogleQuery(query_string) {
+  return 'http://www.google.com/#q=' + query_string;
+}
+
 function addMatches(matches) {
   $('span.possibility').each(function(index) {
     var current_item = $(this).html();
@@ -40,22 +44,19 @@ function addMatches(matches) {
     }
   });    
   for (var i = 0; i < matches.length; i++) {
-    $('div.flexsearch').append('<a href="http://www.google.com/#q=' + matches[i] + '" target="blank"><span class="possibility">' + matches[i] + '</span></a>');
+    $('div.flexsearch').append('<a href="' + buildGoogleQuery(matches[i]) + '" target="blank"><span class="possibility">' + matches[i] + '</span></a>');
   }
-  $('span.possibility').fadeTo(100, 1);
+  $('span.possibility').fadeTo(400, 1);
 }
 
 (function() {
-  // Magic!
-  console.log('Keepin\'n it clean with an external script!');
-  
   //Disable the search bar
-  toggleInputs(false);
+  toggleInputs(false); // If we can't grab the json object, leave the input fields disabled
   
-  //retrieve all of the data
+  // retrieve all of the data
   var search_list = [];
   $.getJSON('http://www.mattbowytz.com/simple_api.json?data=all', function(data) {  
-    if (data.data !== null) {
+    if (data.data !== null) { 
       // build up the list
       for (var key in data.data) {
         for (var i = 0; i < data.data[key].length; i++) {
@@ -63,11 +64,18 @@ function addMatches(matches) {
         }
       }
       toggleInputs(true);
-      console.log(search_list);
     }
+
+    // get the comic data too
+    $.getJSON('http://www.mattbowytz.com/simple_api.json?data=comics', function(data) {
+      if (data.data !== null) {
+        for (var i = 0; i < data.data.length; i++) {
+          search_list.push(data.data[i]);
+        }
+      }
+    });
   });
 
-  console.log($('input.flexsearch-input'));
   $('input.flexsearch-input').keyup(function() {
     var search_text = $(this).val();
     var matches = []
@@ -75,5 +83,17 @@ function addMatches(matches) {
       matches = getPotentialMatches(search_text.trim(), search_list);
     }
     addMatches(matches);
+  });
+
+  // If the search_string is blank space, do nothing
+  $('input.flexsearch-submit').click(function(e) {
+    e.preventDefault();
+    search_string = $('input.flexsearch-input').val(); 
+    console.log(search_string);
+    if (search_string.trim() != '') {
+      window.location = buildGoogleQuery(search_string);
+    } else {
+      alert("Please input a search string first!");
+    }
   });
 })();

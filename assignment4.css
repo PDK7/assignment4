@@ -100,4 +100,18 @@ input:-moz-placeholder {
 .possibility {
   opacity: 0;
   display: block;
+  color: #333;
+  font-family: 'Helvetica', sans-serif;
+  font-size: 26px;
+  transition: background-color 1s;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.possibility:hover {
+  background-color: gray;
+}
+
+a {
+  text-decoration: none;
 }
