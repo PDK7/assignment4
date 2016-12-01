@@ -96,3 +96,8 @@ input:-moz-placeholder {
   line-height: 45px;
   text-align: center;
 }
+
+.possibility {
+  opacity: 0;
+  display: block;
+}
